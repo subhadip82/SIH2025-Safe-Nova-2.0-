@@ -19,6 +19,7 @@ import {
   BarChart3
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import Link from 'next/link'
 
 const StudentDashboard: React.FC = () => {
   const { user } = useAuth()
@@ -63,8 +64,16 @@ const StudentDashboard: React.FC = () => {
               <h1 className="text-3xl font-bold text-gray-900">Student Dashboard</h1>
               <p className="text-gray-600">Welcome back, {user?.name}!</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
+            <div className="flex items-center space-x-3">
+              <Link href="/learning" className="hidden sm:inline-flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                <BookOpen className="w-4 h-4" />
+                <span>Learning</span>
+              </Link>
+              <Link href="/quizzes" className="hidden sm:inline-flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <CheckCircle className="w-4 h-4" />
+                <span>Quizzes</span>
+              </Link>
+              <div className="text-right hidden sm:block">
                 <p className="text-sm text-gray-500">Current Points</p>
                 <p className="text-2xl font-bold text-yellow-500">2,450</p>
               </div>
@@ -72,6 +81,17 @@ const StudentDashboard: React.FC = () => {
                 <span className="text-white font-bold text-lg">{user?.name?.charAt(0)}</span>
               </div>
             </div>
+          </div>
+          {/* Mobile quick links */}
+          <div className="mt-4 flex sm:hidden items-center gap-3">
+            <Link href="/learning" className="flex-1 inline-flex items-center justify-center space-x-2 bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+              <BookOpen className="w-4 h-4" />
+              <span>Learning</span>
+            </Link>
+            <Link href="/quizzes" className="flex-1 inline-flex items-center justify-center space-x-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+              <CheckCircle className="w-4 h-4" />
+              <span>Quizzes</span>
+            </Link>
           </div>
         </div>
       </div>
@@ -108,9 +128,9 @@ const StudentDashboard: React.FC = () => {
             >
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Learning Modules</h2>
-                <button className="text-blue-600 hover:text-blue-700 font-medium">
+                <Link href="/learning" className="text-blue-600 hover:text-blue-700 font-medium">
                   View All
-                </button>
+                </Link>
               </div>
               
               <div className="space-y-4">
@@ -161,7 +181,10 @@ const StudentDashboard: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="bg-white rounded-xl shadow-lg p-6"
             >
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Quizzes</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900">Recent Quizzes</h3>
+                <Link href="/quizzes" className="text-blue-600 hover:text-blue-700 font-medium text-sm">View All</Link>
+              </div>
               <div className="space-y-3">
                 {recentQuizzes.map((quiz, index) => (
                   <div key={quiz.title} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -175,9 +198,9 @@ const StudentDashboard: React.FC = () => {
                         <CheckCircle className="w-4 h-4 text-green-500" />
                       </div>
                     ) : (
-                      <button className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                      <Link href="/quizzes" className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-700 transition-colors">
                         Start
-                      </button>
+                      </Link>
                     )}
                   </div>
                 ))}
@@ -225,17 +248,21 @@ const StudentDashboard: React.FC = () => {
             >
               <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <button className="w-full flex items-center space-x-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                  <BookOpen className="w-5 h-5 text-blue-600" />
-                  <span className="font-medium text-blue-900">Start New Quiz</span>
-                </button>
+                <Link href="/quizzes" className="w-full flex items-center space-x-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                  <CheckCircle className="w-5 h-5 text-blue-600" />
+                  <span className="font-medium text-blue-900">Go to Quizzes</span>
+                </Link>
+                <Link href="/learning" className="w-full flex items-center space-x-3 p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                  <BookOpen className="w-5 h-5 text-purple-600" />
+                  <span className="font-medium text-purple-900">Go to Learning</span>
+                </Link>
                 <button className="w-full flex items-center space-x-3 p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
                   <Play className="w-5 h-5 text-green-600" />
                   <span className="font-medium text-green-900">Watch Tutorial</span>
                 </button>
-                <button className="w-full flex items-center space-x-3 p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                  <Gamepad2 className="w-5 h-5 text-purple-600" />
-                  <span className="font-medium text-purple-900">Play Game</span>
+                <button className="w-full flex items-center space-x-3 p-3 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
+                  <Gamepad2 className="w-5 h-5 text-orange-600" />
+                  <span className="font-medium text-orange-900">Play Game</span>
                 </button>
               </div>
             </motion.div>

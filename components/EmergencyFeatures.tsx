@@ -32,6 +32,7 @@ const EmergencyFeatures: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false)
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
+  const [aiLabels, setAiLabels] = useState<{ name: string; confidence: number }[] | null>(null)
   const [chatMessage, setChatMessage] = useState('')
   const [chatMessages, setChatMessages] = useState([
     { id: 1, text: 'Hello! I\'m your emergency assistant. How can I help you?', isBot: true, timestamp: new Date() }
@@ -58,20 +59,34 @@ const EmergencyFeatures: React.FC = () => {
   ]
 
   const handleImageCapture = () => {
-    // Simulate camera capture
     setCapturedImage('https://images.unsplash.com/photo-1581578731548-c6a0c3f8f5a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80')
   }
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       const reader = new FileReader()
-      reader.onload = (e) => {
-        setUploadedImage(e.target?.result as string)
-        // Simulate AI analysis
-        setTimeout(() => {
-          setAiAnalysis('This image shows a disaster scenario with damaged infrastructure. Emergency services should be contacted immediately.')
-        }, 2000)
+      reader.onload = async (e) => {
+        const base64 = e.target?.result as string
+        setUploadedImage(base64)
+        try {
+          const res = await fetch('/api/ai/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64 })
+          })
+          const data = await res.json()
+          if (data.success) {
+            setAiAnalysis(data.data.description)
+            setAiLabels(data.data.labels)
+          } else {
+            setAiAnalysis('AI analysis failed. Please try again later.')
+            setAiLabels(null)
+          }
+        } catch (err) {
+          setAiAnalysis('AI analysis failed due to network error.')
+          setAiLabels(null)
+        }
       }
       reader.readAsDataURL(file)
     }
@@ -88,7 +103,6 @@ const EmergencyFeatures: React.FC = () => {
       setChatMessages([...chatMessages, newMessage])
       setChatMessage('')
       
-      // Simulate bot response
       setTimeout(() => {
         const botResponse = {
           id: chatMessages.length + 2,
@@ -139,7 +153,7 @@ const EmergencyFeatures: React.FC = () => {
       title: t('features.image_recognition'),
       icon: Eye,
       color: 'bg-purple-500',
-      component: <ImageRecognition onUpload={handleImageUpload} uploadedImage={uploadedImage} aiAnalysis={aiAnalysis} />
+      component: <ImageRecognition onUpload={handleImageUpload} uploadedImage={uploadedImage} aiAnalysis={aiAnalysis} aiLabels={aiLabels} />
     },
     {
       id: 'chatbot',
@@ -347,7 +361,8 @@ const ImageRecognition: React.FC<{
   onUpload: (event: React.ChangeEvent<HTMLInputElement>) => void
   uploadedImage: string | null
   aiAnalysis: string | null
-}> = ({ onUpload, uploadedImage, aiAnalysis }) => (
+  aiLabels: { name: string; confidence: number }[] | null
+}> = ({ onUpload, uploadedImage, aiAnalysis, aiLabels }) => (
   <div className="space-y-4">
     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
       <input
@@ -385,7 +400,17 @@ const ImageRecognition: React.FC<{
             className="p-4 bg-purple-50 rounded-lg"
           >
             <h4 className="font-semibold text-purple-900 mb-2">AI Analysis</h4>
-            <p className="text-purple-800">{aiAnalysis}</p>
+            <p className="text-purple-800 mb-3">{aiAnalysis}</p>
+            {aiLabels && (
+              <div className="space-y-2">
+                {aiLabels.map(l => (
+                  <div key={l.name} className="flex items-center justify-between text-sm">
+                    <span className="text-purple-900">{l.name}</span>
+                    <span className="text-purple-700 font-medium">{Math.round(l.confidence * 100)}%</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
       </motion.div>

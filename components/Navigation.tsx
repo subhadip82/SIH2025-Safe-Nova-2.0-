@@ -23,6 +23,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { UserRole } from '@/contexts/AuthContext'
+import Link from 'next/link'
 
 const Navigation: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -36,11 +37,11 @@ const Navigation: React.FC = () => {
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
-    { code: 'bn', name: 'বাংলা', flag: '🇧🇩' },
+    { code: 'hi', name: 'हिन्दी', flag: '\ud83c\uddee🇳' },
+    { code: 'bn', name: 'বাংলা', flag: '\ud83c\udde7🇩' },
     { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
-    { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
-    { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+    { code: 'te', name: 'తెలుగు', flag: '\ud83c\uddee🇳' },
+    { code: 'mr', name: 'मराठी', flag: '🇮\ud83c\uddf3' },
     { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' }
   ]
 
@@ -70,6 +71,18 @@ const Navigation: React.FC = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
+              {user?.role === 'student' && (
+                <>
+                  <Link href="/learning" className="text-gray-700 hover:text-blue-600 transition-colors">Learning</Link>
+                  <Link href="/quizzes" className="text-gray-700 hover:text-blue-600 transition-colors">Quizzes</Link>
+                </>
+              )}
+              {user?.role === 'teacher' && (
+                <>
+                  <Link href="/teacher/quizzes/new" className="text-gray-700 hover:text-blue-600 transition-colors">Create Quiz</Link>
+                  <Link href="/teacher/students" className="text-gray-700 hover:text-blue-600 transition-colors">Students</Link>
+                </>
+              )}
               {/* Team Dropdown */}
               <div className="relative">
                 <button
@@ -208,6 +221,18 @@ const Navigation: React.FC = () => {
                 className="md:hidden border-t border-gray-200 py-4"
               >
                 <div className="space-y-4">
+                  {user?.role === 'student' && (
+                    <>
+                      <Link href="/learning" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 transition-colors">Learning</Link>
+                      <Link href="/quizzes" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 transition-colors">Quizzes</Link>
+                    </>
+                  )}
+                  {user?.role === 'teacher' && (
+                    <>
+                      <Link href="/teacher/quizzes/new" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 transition-colors">Create Quiz</Link>
+                      <Link href="/teacher/students" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 transition-colors">Students</Link>
+                    </>
+                  )}
                   <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors w-full text-left">
                     <Users className="w-4 h-4" />
                     <span>{t('nav.team')}</span>
