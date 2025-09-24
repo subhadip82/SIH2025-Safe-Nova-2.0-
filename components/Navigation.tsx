@@ -72,6 +72,9 @@ const Navigation: React.FC = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
+                {user?.role === 'student' && (
+                  <Link href="/simulation" className="text-gray-700 hover:text-blue-600 transition-colors font-semibold">Simulation Games</Link>
+                )}
               {user?.role === 'student' && (
                 <>
                   <Link href="/learning" className="text-gray-700 hover:text-blue-600 transition-colors">Learning</Link>
@@ -236,6 +239,9 @@ const Navigation: React.FC = () => {
                 className="md:hidden border-t border-gray-200 py-4"
               >
                 <div className="space-y-4">
+                    {user?.role === 'student' && (
+                      <Link href="/simulation" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 transition-colors font-semibold">Simulation Games</Link>
+                    )}
                   {user ? (
                     <div className="flex items-center space-x-3 px-2">
                       <img src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3b82f6&color=fff`} alt="avatar" className="w-8 h-8 rounded-full object-cover border" />
