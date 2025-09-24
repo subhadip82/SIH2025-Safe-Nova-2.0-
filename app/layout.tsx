@@ -5,6 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { LanguageProvider } from '@/contexts/LanguageContext'
 import { Toaster } from 'react-hot-toast'
 import AlertsClient from '@/components/AlertsClient'
+import PwaInstallPrompt from '@/components/PwaInstallPrompt'
 import OfflineBanner from '@/components/OfflineBanner'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -23,12 +24,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#2563eb" />
         <script dangerouslySetInnerHTML={{ __html: `if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/service-worker.js').catch(() => {}); }); }` }} />
       </head>
       <body className={inter.className}>
         <LanguageProvider>
           <AuthProvider>
             <OfflineBanner />
+            <PwaInstallPrompt />
             <AlertsClient />
             {children}
             <Toaster 

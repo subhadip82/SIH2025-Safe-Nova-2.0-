@@ -1,3 +1,4 @@
+  description: 'Add trusted contacts and share your safety status during emergencies.',
 'use client'
 
 import React, { useState, useRef } from 'react'
@@ -182,7 +183,59 @@ const EmergencyFeatures: React.FC = () => {
     }
   }
 
+  const [safetyContacts, setSafetyContacts] = useState<{ name: string; phone: string; status: 'safe' | 'help' | 'unknown' }[]>([]);
+  const [newContact, setNewContact] = useState({ name: '', phone: '' });
+  const [statusMessage, setStatusMessage] = useState('');
+
+  const addContact = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newContact.name || !newContact.phone) return;
+    setSafetyContacts([...safetyContacts, { ...newContact, status: 'unknown' }]);
+    setNewContact({ name: '', phone: '' });
+    setStatusMessage('');
+  };
+
+  const updateStatus = (idx: number, status: 'safe' | 'help') => {
+    setSafetyContacts(safetyContacts.map((c, i) => i === idx ? { ...c, status } : c));
+    setStatusMessage(status === 'safe' ? 'Status updated: Marked as Safe.' : 'Status updated: Needs Help!');
+    setTimeout(() => setStatusMessage(''), 2000);
+  };
+
   const features = [
+    {
+      id: 'safety-network',
+      title: 'Family & Friends Safety Network',
+      icon: Users,
+      color: 'bg-cyan-600',
+      component: (
+        <div className="p-4 max-w-lg mx-auto">
+          <h3 className="text-2xl font-bold text-cyan-700 mb-2 flex items-center gap-2"><Users className="w-6 h-6" /> Family & Friends Safety Network</h3>
+          <p className="text-gray-700 mb-4">Add trusted contacts and share your safety status during emergencies. Mark yourself or others as Safe or in Need of Help.</p>
+          <form onSubmit={addContact} className="flex flex-col md:flex-row gap-2 mb-4">
+            <input type="text" placeholder="Name" value={newContact.name} onChange={e => setNewContact({ ...newContact, name: e.target.value })} className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-400" required />
+            <input type="tel" placeholder="Phone" value={newContact.phone} onChange={e => setNewContact({ ...newContact, phone: e.target.value })} className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-400" required />
+            <button type="submit" className="px-4 py-2 bg-cyan-600 text-white rounded-lg font-semibold hover:bg-cyan-700 transition-all">Add</button>
+          </form>
+          {statusMessage && <div className="mb-2 text-center text-sm font-semibold text-green-600 animate-pulse">{statusMessage}</div>}
+          <div className="space-y-3">
+            {safetyContacts.length === 0 && <div className="text-gray-400 text-center">No contacts added yet.</div>}
+            {safetyContacts.map((contact, idx) => (
+              <div key={idx} className="flex flex-col md:flex-row items-center justify-between gap-2 bg-cyan-50 border border-cyan-200 rounded-xl p-3 shadow">
+                <div className="flex-1">
+                  <div className="font-semibold text-cyan-800">{contact.name}</div>
+                  <div className="text-gray-600 text-sm">{contact.phone}</div>
+                </div>
+                <div className="flex gap-2 mt-2 md:mt-0">
+                  <button onClick={() => updateStatus(idx, 'safe')} className={`px-3 py-1 rounded-lg font-bold text-white bg-green-500 hover:bg-green-600 transition-all ${contact.status === 'safe' ? 'ring-2 ring-green-400' : ''}`}>Safe</button>
+                  <button onClick={() => updateStatus(idx, 'help')} className={`px-3 py-1 rounded-lg font-bold text-white bg-red-500 hover:bg-red-600 transition-all ${contact.status === 'help' ? 'ring-2 ring-red-400' : ''}`}>Help</button>
+                </div>
+                <div className="text-xs text-gray-500 mt-1 md:mt-0">{contact.status === 'safe' ? '✅ Safe' : contact.status === 'help' ? '🚨 Needs Help' : 'Unknown'}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    },
     {
       id: 'ar-evacuation',
       title: 'AR Evacuation Guides',
@@ -276,6 +329,7 @@ const EmergencyFeatures: React.FC = () => {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
                 <p className="text-gray-600">
+                  {feature.id === 'safety-network' && 'Add trusted contacts and share your safety status during emergencies.'}
                   {feature.id === 'emergency-contacts' && 'Quick access to emergency numbers'}
                   {feature.id === 'image-caption' && 'Capture and analyze emergency situations'}
                   {feature.id === 'safe-places' && 'Find nearest safe locations and shelters'}
