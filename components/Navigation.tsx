@@ -18,7 +18,8 @@ import {
   Truck,
   Stethoscope,
   Heart,
-  Shield as PoliceShield
+  Shield as PoliceShield,
+  ClipboardCheck
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -72,6 +73,10 @@ const Navigation: React.FC = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
+                <Link href="/emergency-plan" className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors font-semibold">
+                  <ClipboardCheck className="w-5 h-5 text-green-600" />
+                  Emergency Plan
+                </Link>
                 {user?.role === 'student' && (
                   <Link href="/simulation" className="text-gray-700 hover:text-blue-600 transition-colors font-semibold">Simulation Games</Link>
                 )}
@@ -239,6 +244,10 @@ const Navigation: React.FC = () => {
                 className="md:hidden border-t border-gray-200 py-4"
               >
                 <div className="space-y-4">
+                    <Link href="/emergency-plan" onClick={() => setIsMenuOpen(false)} className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors font-semibold">
+                      <ClipboardCheck className="w-5 h-5 text-green-600" />
+                      Emergency Plan
+                    </Link>
                     {user?.role === 'student' && (
                       <Link href="/simulation" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 transition-colors font-semibold">Simulation Games</Link>
                     )}
