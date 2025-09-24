@@ -1,13 +1,14 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Phone, 
-  Camera, 
-  MapPin, 
-  Eye, 
-  MessageCircle, 
+import {
+  Phone,
+  Camera,
+  MapPin,
+  Eye,
+  MessageCircle,
   Share2,
   X,
   Download,
@@ -20,11 +21,11 @@ import {
   Users,
   Send,
   Image as ImageIcon,
-  Map,
   Mic,
-  MicOff
-} from 'lucide-react'
-import { useLanguage } from '@/contexts/LanguageContext'
+  MicOff,
+  ClipboardCheck,
+  Map as MapIcon
+} from 'lucide-react';
 
 const EmergencyFeatures: React.FC = () => {
   const [activeFeature, setActiveFeature] = useState<string | null>(null)
@@ -183,6 +184,21 @@ const EmergencyFeatures: React.FC = () => {
 
   const features = [
     {
+      id: 'ar-evacuation',
+      title: 'AR Evacuation Guides',
+  icon: MapIcon,
+      color: 'bg-yellow-500',
+      component: (
+        <div className="text-center p-4">
+          <p className="text-lg font-semibold text-yellow-700 mb-2">Augmented Reality Evacuation Guides</p>
+          <p className="text-gray-700 mb-4">Use your mobile device to view safe evacuation routes in real time. (AR demo coming soon!)</p>
+          <div className="flex justify-center">
+            <MapIcon className="w-16 h-16 text-yellow-400 animate-pulse" />
+          </div>
+        </div>
+      )
+    },
+    {
       id: 'emergency-contacts',
       title: t('features.emergency_contacts'),
       icon: Phone,
@@ -266,6 +282,7 @@ const EmergencyFeatures: React.FC = () => {
                   {feature.id === 'image-recognition' && 'AI-powered disaster image analysis (with voice read-out)'}
                   {feature.id === 'chatbot' && '24/7 emergency assistance and guidance with voice input'}
                   {feature.id === 'share' && 'Share disaster information and get community support'}
+                  {feature.id === 'ar-evacuation' && 'View safe evacuation routes in AR (Augmented Reality)'}
                 </p>
               </div>
             </motion.div>
