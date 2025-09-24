@@ -10,6 +10,8 @@ export interface User {
   email: string
   role: UserRole
   avatar?: string
+  phone?: string
+  address?: string
 }
 
 interface AuthContextType {
@@ -17,6 +19,7 @@ interface AuthContextType {
   login: (email: string, password: string, role: UserRole) => Promise<boolean>
   logout: () => void
   isLoading: boolean
+  updateProfile: (updates: Partial<User>) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -34,7 +37,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Check for existing session
     const savedUser = localStorage.getItem('safenova_user')
     if (savedUser) {
       setUser(JSON.parse(savedUser))
@@ -44,26 +46,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string, role: UserRole): Promise<boolean> => {
     setIsLoading(true)
-    
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Mock authentication - in real app, this would be an API call
     if (email && password && role) {
+      const baseName = email.split('@')[0]
       const newUser: User = {
         id: Math.random().toString(36).substr(2, 9),
-        name: email.split('@')[0],
+        name: baseName,
         email,
         role,
-        avatar: `https://ui-avatars.com/api/?name=${email.split('@')[0]}&background=3b82f6&color=fff`
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(baseName)}&background=3b82f6&color=fff`,
+        phone: '',
+        address: ''
       }
-      
       setUser(newUser)
       localStorage.setItem('safenova_user', JSON.stringify(newUser))
       setIsLoading(false)
       return true
     }
-    
     setIsLoading(false)
     return false
   }
@@ -73,11 +72,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('safenova_user')
   }
 
+  const updateProfile = (updates: Partial<User>) => {
+    setUser((prev) => {
+      if (!prev) return prev
+      const next = { ...prev, ...updates }
+      localStorage.setItem('safenova_user', JSON.stringify(next))
+      return next
+    })
+  }
+
   const value = {
     user,
     login,
     logout,
-    isLoading
+    isLoading,
+    updateProfile
   }
 
   return (

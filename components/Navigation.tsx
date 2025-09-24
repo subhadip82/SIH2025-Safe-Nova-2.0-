@@ -13,11 +13,11 @@ import {
   UserPlus, 
   LogOut,
   LayoutDashboard,
-  Phone,
-  Heart,
-  Truck,
+  User,
   AlertTriangle,
+  Truck,
   Stethoscope,
+  Heart,
   Shield as PoliceShield
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
@@ -31,6 +31,7 @@ const Navigation: React.FC = () => {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
   
   const { user, logout } = useAuth()
   const { currentLanguage, setLanguage, t } = useLanguage()
@@ -70,7 +71,7 @@ const Navigation: React.FC = () => {
             </div>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-6">
               {user?.role === 'student' && (
                 <>
                   <Link href="/learning" className="text-gray-700 hover:text-blue-600 transition-colors">Learning</Link>
@@ -164,21 +165,35 @@ const Navigation: React.FC = () => {
               {/* Auth Buttons */}
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-700">Welcome, {user.name}</span>
-                  <button
-                    onClick={() => window.location.href = '/dashboard'}
-                    className="flex items-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <LayoutDashboard className="w-4 h-4" />
-                    <span>{t('nav.dashboard')}</span>
-                  </button>
-                  <button
-                    onClick={logout}
-                    className="flex items-center space-x-1 text-gray-700 hover:text-red-600 transition-colors"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>{t('nav.logout')}</span>
-                  </button>
+                  {/* Avatar dropdown */}
+                  <div className="relative">
+                    <button onClick={()=>setIsProfileOpen(v=>!v)} className="flex items-center space-x-2">
+                      <img
+                        src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3b82f6&color=fff`}
+                        alt="avatar"
+                        className="w-8 h-8 rounded-full object-cover border"
+                      />
+                      <ChevronDown className="w-4 h-4 text-gray-600" />
+                    </button>
+                    <AnimatePresence>
+                      {isProfileOpen && (
+                        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-xl border p-2">
+                          <Link href="/profile" onClick={()=>setIsProfileOpen(false)} className="flex items-center space-x-2 px-3 py-2 rounded hover:bg-gray-50">
+                            <User className="w-4 h-4 text-gray-600" />
+                            <span>Profile</span>
+                          </Link>
+                          <Link href="/dashboard" onClick={()=>setIsProfileOpen(false)} className="flex items-center space-x-2 px-3 py-2 rounded hover:bg-gray-50">
+                            <LayoutDashboard className="w-4 h-4 text-gray-600" />
+                            <span>Dashboard</span>
+                          </Link>
+                          <button onClick={()=>{setIsProfileOpen(false); logout()}} className="w-full text-left flex items-center space-x-2 px-3 py-2 rounded hover:bg-gray-50">
+                            <LogOut className="w-4 h-4 text-gray-600" />
+                            <span>Logout</span>
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               ) : (
                 <div className="flex items-center space-x-4">
@@ -221,6 +236,13 @@ const Navigation: React.FC = () => {
                 className="md:hidden border-t border-gray-200 py-4"
               >
                 <div className="space-y-4">
+                  {user ? (
+                    <div className="flex items-center space-x-3 px-2">
+                      <img src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=3b82f6&color=fff`} alt="avatar" className="w-8 h-8 rounded-full object-cover border" />
+                      <div className="text-gray-800 font-medium">{user.name}</div>
+                    </div>
+                  ) : null}
+
                   {user?.role === 'student' && (
                     <>
                       <Link href="/learning" onClick={() => setIsMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 transition-colors">Learning</Link>
@@ -245,17 +267,9 @@ const Navigation: React.FC = () => {
 
                   {user ? (
                     <div className="space-y-2">
-                      <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors w-full text-left">
-                        <LayoutDashboard className="w-4 h-4" />
-                        <span>{t('nav.dashboard')}</span>
-                      </button>
-                      <button
-                        onClick={logout}
-                        className="flex items-center space-x-2 text-gray-700 hover:text-red-600 transition-colors w-full text-left"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>{t('nav.logout')}</span>
-                      </button>
+                      <Link href="/profile" onClick={()=>setIsMenuOpen(false)} className="block px-4 py-2 hover:bg-gray-50">Profile</Link>
+                      <Link href="/dashboard" onClick={()=>setIsMenuOpen(false)} className="block px-4 py-2 hover:bg-gray-50">Dashboard</Link>
+                      <button onClick={()=>{setIsMenuOpen(false); logout()}} className="block w-full text-left px-4 py-2 hover:bg-gray-50">Logout</button>
                     </div>
                   ) : (
                     <div className="space-y-2">
