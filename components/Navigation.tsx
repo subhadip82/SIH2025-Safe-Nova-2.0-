@@ -1,0 +1,539 @@
+'use client'
+
+import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { 
+  Menu, 
+  X, 
+  ChevronDown, 
+  Shield, 
+  Users, 
+  Globe, 
+  LogIn, 
+  UserPlus, 
+  LogOut,
+  LayoutDashboard,
+  Phone,
+  Heart,
+  Truck,
+  AlertTriangle,
+  Stethoscope,
+  Shield as PoliceShield
+} from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { UserRole } from '@/contexts/AuthContext'
+
+const Navigation: React.FC = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isTeamDropdownOpen, setIsTeamDropdownOpen] = useState(false)
+  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false)
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
+  
+  const { user, logout } = useAuth()
+  const { currentLanguage, setLanguage, t } = useLanguage()
+
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'hi', name: 'हिन्दी', flag: '🇮🇳' },
+    { code: 'bn', name: 'বাংলা', flag: '🇧🇩' },
+    { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
+    { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+    { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
+    { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' }
+  ]
+
+  const emergencyTeams = [
+    { name: t('team.fire'), icon: Shield, color: 'text-red-500' },
+    { name: t('team.earthquake'), icon: AlertTriangle, color: 'text-orange-500' },
+    { name: t('team.flood'), icon: Truck, color: 'text-blue-500' },
+    { name: t('team.medical'), icon: Stethoscope, color: 'text-green-500' },
+    { name: t('team.police'), icon: PoliceShield, color: 'text-blue-600' },
+    { name: t('team.rescue'), icon: Heart, color: 'text-pink-500' }
+  ]
+
+  return (
+    <>
+      <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo and Name */}
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-xl font-bold gradient-text">SafeNova</span>
+              </div>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              {/* Team Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsTeamDropdownOpen(!isTeamDropdownOpen)}
+                  className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  <Users className="w-4 h-4" />
+                  <span>{t('nav.team')}</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+
+                <AnimatePresence>
+                  {isTeamDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-xl border border-gray-200 py-2"
+                    >
+                      {emergencyTeams.map((team, index) => (
+                        <motion.div
+                          key={team.name}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="flex items-center space-x-3 px-4 py-2 hover:bg-gray-50 cursor-pointer"
+                        >
+                          <team.icon className={`w-5 h-5 ${team.color}`} />
+                          <span className="text-gray-700">{team.name}</span>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Language Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+                  className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
+                >
+                  <Globe className="w-4 h-4" />
+                  <span>{t('nav.language')}</span>
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+
+                <AnimatePresence>
+                  {isLanguageDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2"
+                    >
+                      {languages.map((lang, index) => (
+                        <motion.button
+                          key={lang.code}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          onClick={() => {
+                            setLanguage(lang.code as any)
+                            setIsLanguageDropdownOpen(false)
+                          }}
+                          className={`w-full flex items-center space-x-3 px-4 py-2 hover:bg-gray-50 transition-colors ${
+                            currentLanguage === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                          }`}
+                        >
+                          <span className="text-lg">{lang.flag}</span>
+                          <span>{lang.name}</span>
+                        </motion.button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Auth Buttons */}
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-700">Welcome, {user.name}</span>
+                  <button
+                    onClick={() => window.location.href = '/dashboard'}
+                    className="flex items-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    <span>{t('nav.dashboard')}</span>
+                  </button>
+                  <button
+                    onClick={logout}
+                    className="flex items-center space-x-1 text-gray-700 hover:text-red-600 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>{t('nav.logout')}</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setIsLoginModalOpen(true)}
+                    className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 transition-colors"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    <span>{t('nav.login')}</span>
+                  </button>
+                  <button
+                    onClick={() => setIsRegisterModalOpen(true)}
+                    className="flex items-center space-x-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>{t('nav.register')}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="md:hidden border-t border-gray-200 py-4"
+              >
+                <div className="space-y-4">
+                  <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors w-full text-left">
+                    <Users className="w-4 h-4" />
+                    <span>{t('nav.team')}</span>
+                  </button>
+                  
+                  <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors w-full text-left">
+                    <Globe className="w-4 h-4" />
+                    <span>{t('nav.language')}</span>
+                  </button>
+
+                  {user ? (
+                    <div className="space-y-2">
+                      <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors w-full text-left">
+                        <LayoutDashboard className="w-4 h-4" />
+                        <span>{t('nav.dashboard')}</span>
+                      </button>
+                      <button
+                        onClick={logout}
+                        className="flex items-center space-x-2 text-gray-700 hover:text-red-600 transition-colors w-full text-left"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>{t('nav.logout')}</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => setIsLoginModalOpen(true)}
+                        className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors w-full text-left"
+                      >
+                        <LogIn className="w-4 h-4" />
+                        <span>{t('nav.login')}</span>
+                      </button>
+                      <button
+                        onClick={() => setIsRegisterModalOpen(true)}
+                        className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors w-full"
+                      >
+                        <UserPlus className="w-4 h-4" />
+                        <span>{t('nav.register')}</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </nav>
+
+      {/* Login Modal */}
+      <AnimatePresence>
+        {isLoginModalOpen && (
+          <LoginModal 
+            isOpen={isLoginModalOpen}
+            onClose={() => setIsLoginModalOpen(false)}
+            onRegister={() => {
+              setIsLoginModalOpen(false)
+              setIsRegisterModalOpen(true)
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Register Modal */}
+      <AnimatePresence>
+        {isRegisterModalOpen && (
+          <RegisterModal 
+            isOpen={isRegisterModalOpen}
+            onClose={() => setIsRegisterModalOpen(false)}
+            onLogin={() => {
+              setIsRegisterModalOpen(false)
+              setIsLoginModalOpen(true)
+            }}
+          />
+        )}
+      </AnimatePresence>
+    </>
+  )
+}
+
+// Login Modal Component
+const LoginModal: React.FC<{
+  isOpen: boolean
+  onClose: () => void
+  onRegister: () => void
+}> = ({ isOpen, onClose, onRegister }) => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [role, setRole] = useState<UserRole>('student')
+  const [isLoading, setIsLoading] = useState(false)
+  
+  const { login } = useAuth()
+  const { t } = useLanguage()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    const success = await login(email, password, role)
+    if (success) {
+      onClose()
+    }
+    
+    setIsLoading(false)
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-white rounded-xl p-6 w-full max-w-md"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Login to SafeNova</h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Role
+            </label>
+            <select
+              value={role || 'student'}
+              onChange={(e) => setRole(e.target.value as UserRole)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          >
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
+
+        <p className="text-center text-gray-600 mt-4">
+          Don't have an account?{' '}
+          <button
+            onClick={onRegister}
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Register here
+          </button>
+        </p>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+// Register Modal Component
+const RegisterModal: React.FC<{
+  isOpen: boolean
+  onClose: () => void
+  onLogin: () => void
+}> = ({ isOpen, onClose, onLogin }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: 'student' as UserRole
+  })
+  const [isLoading, setIsLoading] = useState(false)
+  
+  const { t } = useLanguage()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    
+    // Simulate registration
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    setIsLoading(false)
+    onClose()
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="bg-white rounded-xl p-6 w-full max-w-md"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Join SafeNova</h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Full Name
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Role
+            </label>
+            <select
+              value={formData.role || 'student'}
+              onChange={(e) => setFormData({...formData, role: e.target.value as UserRole})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="student">Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          >
+            {isLoading ? 'Creating Account...' : 'Create Account'}
+          </button>
+        </form>
+
+        <p className="text-center text-gray-600 mt-4">
+          Already have an account?{' '}
+          <button
+            onClick={onLogin}
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Login here
+          </button>
+        </p>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+export default Navigation
