@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Phone, 
@@ -42,6 +42,54 @@ const EmergencyFeatures: React.FC = () => {
   
   const { t } = useLanguage()
 
+  const recognitionRef = useRef<any>(null)
+
+  const startListening = () => {
+    if (typeof window === 'undefined') return
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      alert('Speech Recognition not supported in this browser.')
+      return
+    }
+    const recognition = new SpeechRecognition()
+    recognition.lang = 'en-US'
+    recognition.interimResults = true
+    recognition.continuous = false
+    recognition.onresult = (event: any) => {
+      let transcript = ''
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript
+      }
+      setChatMessage((prev) => transcript)
+    }
+    recognition.onend = () => {
+      setIsRecording(false)
+    }
+    recognition.onerror = () => {
+      setIsRecording(false)
+    }
+    recognitionRef.current = recognition
+    setIsRecording(true)
+    recognition.start()
+  }
+
+  const stopListening = () => {
+    try {
+      recognitionRef.current?.stop()
+    } catch {}
+    setIsRecording(false)
+  }
+
+  const speak = (text: string) => {
+    if (typeof window === 'undefined') return
+    const synth = window.speechSynthesis
+    if (!synth) return
+    const utter = new SpeechSynthesisUtterance(text)
+    utter.rate = 1
+    utter.pitch = 1
+    synth.speak(utter)
+  }
+
   const emergencyContacts = [
     { name: 'Police', number: '100', icon: Shield, color: 'text-blue-600' },
     { name: 'Fire Department', number: '101', icon: AlertTriangle, color: 'text-red-600' },
@@ -79,13 +127,18 @@ const EmergencyFeatures: React.FC = () => {
           if (data.success) {
             setAiAnalysis(data.data.description)
             setAiLabels(data.data.labels)
+            speak(data.data.description)
           } else {
-            setAiAnalysis('AI analysis failed. Please try again later.')
+            const msg = 'AI analysis failed. Please try again later.'
+            setAiAnalysis(msg)
             setAiLabels(null)
+            speak(msg)
           }
         } catch (err) {
-          setAiAnalysis('AI analysis failed due to network error.')
+          const msg = 'AI analysis failed due to network error.'
+          setAiAnalysis(msg)
           setAiLabels(null)
+          speak(msg)
         }
       }
       reader.readAsDataURL(file)
@@ -104,13 +157,15 @@ const EmergencyFeatures: React.FC = () => {
       setChatMessage('')
       
       setTimeout(() => {
+        const text = 'Please stay calm and follow emergency protocols. Help is on the way.'
         const botResponse = {
           id: chatMessages.length + 2,
-          text: 'I understand your concern. Please stay calm and follow emergency protocols. Help is on the way.',
+          text,
           isBot: true,
           timestamp: new Date()
         }
         setChatMessages(prev => [...prev, botResponse])
+        speak(text)
       }, 1000)
     }
   }
@@ -160,7 +215,7 @@ const EmergencyFeatures: React.FC = () => {
       title: t('features.chatbot'),
       icon: MessageCircle,
       color: 'bg-orange-500',
-      component: <Chatbot messages={chatMessages} message={chatMessage} onMessageChange={setChatMessage} onSend={handleChatSend} />
+      component: <Chatbot messages={chatMessages} message={chatMessage} onMessageChange={setChatMessage} onSend={handleChatSend} onMicToggle={() => (isRecording ? stopListening() : startListening())} isRecording={isRecording} />
     },
     {
       id: 'share',
@@ -208,8 +263,8 @@ const EmergencyFeatures: React.FC = () => {
                   {feature.id === 'emergency-contacts' && 'Quick access to emergency numbers'}
                   {feature.id === 'image-caption' && 'Capture and analyze emergency situations'}
                   {feature.id === 'safe-places' && 'Find nearest safe locations and shelters'}
-                  {feature.id === 'image-recognition' && 'AI-powered disaster image analysis'}
-                  {feature.id === 'chatbot' && '24/7 emergency assistance and guidance'}
+                  {feature.id === 'image-recognition' && 'AI-powered disaster image analysis (with voice read-out)'}
+                  {feature.id === 'chatbot' && '24/7 emergency assistance and guidance with voice input'}
                   {feature.id === 'share' && 'Share disaster information and get community support'}
                 </p>
               </div>
@@ -365,40 +420,18 @@ const ImageRecognition: React.FC<{
 }> = ({ onUpload, uploadedImage, aiAnalysis, aiLabels }) => (
   <div className="space-y-4">
     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-      <input
-        type="file"
-        accept="image/*"
-        onChange={onUpload}
-        className="hidden"
-        id="image-upload"
-      />
-      <label
-        htmlFor="image-upload"
-        className="cursor-pointer flex flex-col items-center space-y-2"
-      >
+      <input type="file" accept="image/*" onChange={onUpload} className="hidden" id="image-upload" />
+      <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center space-y-2">
         <Upload className="w-8 h-8 text-gray-400" />
         <span className="text-gray-600">Click to upload image for AI analysis</span>
       </label>
     </div>
 
     {uploadedImage && (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="space-y-4"
-      >
-        <img
-          src={uploadedImage}
-          alt="Uploaded"
-          className="w-full h-64 object-cover rounded-lg"
-        />
-        
+      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="space-y-4">
+        <img src={uploadedImage} alt="Uploaded" className="w-full h-64 object-cover rounded-lg" />
         {aiAnalysis && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-4 bg-purple-50 rounded-lg"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-purple-50 rounded-lg">
             <h4 className="font-semibold text-purple-900 mb-2">AI Analysis</h4>
             <p className="text-purple-800 mb-3">{aiAnalysis}</p>
             {aiLabels && (
@@ -418,46 +451,38 @@ const ImageRecognition: React.FC<{
   </div>
 )
 
-// Chatbot Component
 const Chatbot: React.FC<{
   messages: any[]
   message: string
   onMessageChange: (message: string) => void
   onSend: () => void
-}> = ({ messages, message, onMessageChange, onSend }) => (
+  onMicToggle: () => void
+  isRecording: boolean
+}> = ({ messages, message, onMessageChange, onSend, onMicToggle, isRecording }) => (
   <div className="space-y-4">
     <div className="h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
       {messages.map((msg) => (
-        <div
-          key={msg.id}
-          className={`mb-3 ${msg.isBot ? 'text-left' : 'text-right'}`}
-        >
-          <div
-            className={`inline-block p-3 rounded-lg max-w-xs ${
-              msg.isBot
-                ? 'bg-white text-gray-900'
-                : 'bg-blue-600 text-white'
-            }`}
-          >
+        <div key={msg.id} className={`mb-3 ${msg.isBot ? 'text-left' : 'text-right'}`}>
+          <div className={`inline-block p-3 rounded-lg max-w-xs ${msg.isBot ? 'bg-white text-gray-900' : 'bg-blue-600 text-white'}`}>
             {msg.text}
           </div>
         </div>
       ))}
     </div>
     
-    <div className="flex space-x-2">
+    <div className="flex space-x-2 items-center">
+      <button onClick={onMicToggle} className={`p-2 rounded-lg border ${isRecording ? 'border-red-500 text-red-600' : 'border-gray-300 text-gray-700 hover:bg-gray-50'}`} title="Toggle voice input">
+        {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+      </button>
       <input
         type="text"
         value={message}
         onChange={(e) => onMessageChange(e.target.value)}
-        placeholder="Type your message..."
+        placeholder="Type your message or use voice..."
         className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         onKeyPress={(e) => e.key === 'Enter' && onSend()}
       />
-      <button
-        onClick={onSend}
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-      >
+      <button onClick={onSend} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
         <Send className="w-4 h-4" />
       </button>
     </div>
