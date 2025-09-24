@@ -19,6 +19,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 
 const HeroSection: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [slideKey, setSlideKey] = useState(0)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [selectedRole, setSelectedRole] = useState<'student' | 'teacher' | 'admin' | null>(null)
   
@@ -27,41 +28,43 @@ const HeroSection: React.FC = () => {
 
   const heroImages = [
     {
-      src: 'https://images.unsplash.com/photo-1581578731548-c6a0c3f8f5a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+      src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgAnHKTDk30GoXmogCTR6Q20SsbodHAPXHNkRTM8lPuvzcxg6RXZmfFzcDzXHGcf9EdqM&usqp=CAU',
       title: 'Emergency Response Training',
       description: 'Learn life-saving techniques through interactive simulations'
     },
     {
-      src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+      src: 'https://akm-img-a-in.tosshub.com/indiatoday/styles/medium_crop_simple/public/2024-08/whatsapp_image_2024-08-10_at_3.42.50_pm_2.jpeg?VersionId=18M0xUgaNFM2oxItZmg0.Rj6SOVcxiEo&size=750:*',
       title: 'Disaster Preparedness',
       description: 'Comprehensive training for natural disasters and emergencies'
     },
     {
-      src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+      src: 'https://indianpsu.com/wp-content/uploads/2025/09/Photo-02-dt.-11-September-2025-1024x704.jpeg?x27332',
       title: 'Safety First',
       description: 'Building a culture of safety in educational institutions'
     },
     {
-      src: 'https://images.unsplash.com/photo-1581578731548-c6a0c3f8f5a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
+      src: 'https://cdn1.i-scmp.com/sites/default/files/styles/1020x680/public/images/methode/2015/12/04/b585948c-9a72-11e5-9aa0-28ea742fb738_1280x720.jpg?itok=gR3t7kCl',
       title: 'Community Resilience',
       description: 'Strengthening communities through education and preparedness'
     }
   ]
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroImages.length)
-    }, 5000)
-
-    return () => clearInterval(timer)
-  }, [])
+  // No auto-loop: images only change on arrow click
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % heroImages.length)
+    setCurrentSlide((prev) => {
+      const next = (prev + 1) % heroImages.length;
+      setSlideKey(k => k + 1);
+      return next;
+    });
   }
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length)
+    setCurrentSlide((prev) => {
+      const prevIdx = (prev - 1 + heroImages.length) % heroImages.length;
+      setSlideKey(k => k + 1);
+      return prevIdx;
+    });
   }
 
   const handleRoleLogin = async (role: 'student' | 'teacher' | 'admin') => {
@@ -85,7 +88,7 @@ const HeroSection: React.FC = () => {
       <div className="absolute inset-0">
         <AnimatePresence mode="wait">
           <motion.div
-            key={currentSlide}
+            key={slideKey}
             initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
@@ -95,7 +98,8 @@ const HeroSection: React.FC = () => {
             <img
               src={heroImages[currentSlide].src}
               alt={heroImages[currentSlide].title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover select-none"
+              draggable={false}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
           </motion.div>
@@ -121,7 +125,10 @@ const HeroSection: React.FC = () => {
         {heroImages.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentSlide(index)}
+            onClick={() => {
+              setCurrentSlide(index);
+              setSlideKey(k => k + 1);
+            }}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${
               index === currentSlide ? 'bg-white' : 'bg-white/50'
             }`}

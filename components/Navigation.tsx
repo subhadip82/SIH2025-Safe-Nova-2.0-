@@ -25,6 +25,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { UserRole } from '@/contexts/AuthContext'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 const Navigation: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -56,6 +57,8 @@ const Navigation: React.FC = () => {
     { name: t('team.rescue'), icon: Heart, color: 'text-pink-500' }
   ]
 
+  const pathname = usePathname();
+
   return (
     <>
       <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50">
@@ -71,10 +74,22 @@ const Navigation: React.FC = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-                <Link href="/emergency-plan" className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors font-semibold">
-                  <ClipboardCheck className="w-5 h-5 text-green-600" />
-                  Emergency Plan
-                </Link>
+              {!user && pathname === '/' && (
+                <>
+                  <Link href="/emergency-plan" className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors font-semibold">
+                    <ClipboardCheck className="w-5 h-5 text-green-600" />
+                    Emergency Plan
+                  </Link>
+                  <Link href="/about" className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors font-semibold">
+                    <Globe className="w-5 h-5 text-blue-600" />
+                    About
+                  </Link>
+                </>
+              )}
+              <Link href="/post" className="flex items-center gap-2 text-gray-700 hover:text-pink-600 transition-colors font-semibold">
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2v-8a2 2 0 012-2h2M12 12v6m0 0l-3-3m3 3l3-3m-3-9v6" /></svg>
+                Post
+              </Link>
                 {user?.role === 'student' && (
                   <Link href="/simulation" className="text-gray-700 hover:text-blue-600 transition-colors font-semibold">Simulation Games</Link>
                 )}
