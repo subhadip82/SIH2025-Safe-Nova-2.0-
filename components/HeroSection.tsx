@@ -19,7 +19,6 @@ import { useLanguage } from '@/contexts/LanguageContext'
 
 const HeroSection: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [slideKey, setSlideKey] = useState(0)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [selectedRole, setSelectedRole] = useState<'student' | 'teacher' | 'admin' | null>(null)
   
@@ -28,7 +27,7 @@ const HeroSection: React.FC = () => {
 
   const heroImages = [
     {
-      src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgAnHKTDk30GoXmogCTR6Q20SsbodHAPXHNkRTM8lPuvzcxg6RXZmfFzcDzXHGcf9EdqM&usqp=CAU',
+      src: 'https://i.postimg.cc/Jhg0c1n6/Gemini-Generated-Image-rkev5wrkev5wrkev.png',
       title: 'Emergency Response Training',
       description: 'Learn life-saving techniques through interactive simulations'
     },
@@ -49,23 +48,15 @@ const HeroSection: React.FC = () => {
     }
   ]
 
-  // No auto-loop: images only change on arrow click
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => {
-      const next = (prev + 1) % heroImages.length;
-      setSlideKey(k => k + 1);
-      return next;
-    });
-  }
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => {
-      const prevIdx = (prev - 1 + heroImages.length) % heroImages.length;
-      setSlideKey(k => k + 1);
-      return prevIdx;
-    });
-  }
+const nextSlide = () => {
+  setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+};
+
+const prevSlide = () => {
+  setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+};
 
   const handleRoleLogin = async (role: 'student' | 'teacher' | 'admin') => {
     setSelectedRole(role)
@@ -85,15 +76,16 @@ const HeroSection: React.FC = () => {
   return (
     <section className="relative h-screen overflow-hidden">
       {/* Background Images */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 pointer-events-none">
         <AnimatePresence mode="wait">
           <motion.div
-            key={slideKey}
+            key={currentSlide}
             initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 1 }}
             className="absolute inset-0"
+            style={{ zIndex: 0 }}
           >
             <img
               src={heroImages[currentSlide].src}
@@ -109,13 +101,17 @@ const HeroSection: React.FC = () => {
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all duration-300"
+        className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all duration-300 pointer-events-auto"
+        style={{ zIndex: 20 }}
+        aria-label="Previous Slide"
       >
         <ChevronLeft className="w-6 h-6" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all duration-300"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all duration-300 pointer-events-auto"
+        style={{ zIndex: 20 }}
+        aria-label="Next Slide"
       >
         <ChevronRight className="w-6 h-6" />
       </button>
@@ -125,10 +121,7 @@ const HeroSection: React.FC = () => {
         {heroImages.map((_, index) => (
           <button
             key={index}
-            onClick={() => {
-              setCurrentSlide(index);
-              setSlideKey(k => k + 1);
-            }}
+            onClick={() => setCurrentSlide(index)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${
               index === currentSlide ? 'bg-white' : 'bg-white/50'
             }`}
