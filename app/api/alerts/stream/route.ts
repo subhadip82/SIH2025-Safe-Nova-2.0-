@@ -1,4 +1,6 @@
 import { NextRequest } from 'next/server'
+// Ensure this API route is always server-side and never statically generated
+export const dynamic = "force-dynamic"
 import { subscribe, type AlertPayload } from '@/lib/alerts'
 
 export const runtime = 'nodejs'
