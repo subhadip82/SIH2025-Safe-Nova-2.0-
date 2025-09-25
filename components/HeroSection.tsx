@@ -285,6 +285,7 @@ const prevSlide = () => {
 }
 
 // Login Modal Component
+
 const LoginModal: React.FC<{
   isOpen: boolean
   onClose: () => void
@@ -293,16 +294,38 @@ const LoginModal: React.FC<{
 }> = ({ isOpen, onClose, onLogin, role }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [phone, setPhone] = useState('')
+  const [otpSent, setOtpSent] = useState(false)
+  const [otp, setOtp] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [otpError, setOtpError] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Mock OTP logic
+  const generatedOtp = '123456'
+
+  const handleSendOtp = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!phone.match(/^\d{10}$/)) {
+      setOtpError('Enter a valid 10-digit phone number')
+      return
+    }
+    setOtpSent(true)
+    setOtpError('')
+  }
+
+  const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    onLogin(email, password)
-    setIsLoading(false)
+    setTimeout(() => {
+      if (otp === generatedOtp) {
+        setIsLoading(false)
+        setOtpError('')
+        onLogin(email, password)
+      } else {
+        setIsLoading(false)
+        setOtpError('Invalid OTP')
+      }
+    }, 1000)
   }
 
   if (!isOpen) return null
@@ -325,42 +348,69 @@ const LoginModal: React.FC<{
         <h2 className="text-2xl font-bold text-gray-900 mb-6">
           Login as {role ? role.charAt(0).toUpperCase() + role.slice(1) : 'User'}
         </h2>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-          >
-            {isLoading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
+        {!otpSent ? (
+          <form onSubmit={handleSendOtp} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter 10-digit phone number"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            {otpError && <div className="text-red-600 text-sm mb-2">{otpError}</div>}
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Send OTP
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyOtp} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Enter OTP (use 123456 for demo)</label>
+              <input
+                type="text"
+                value={otp}
+                onChange={e => setOtp(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
+            {otpError && <div className="text-red-600 text-sm mb-2">{otpError}</div>}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {isLoading ? 'Verifying...' : 'Verify OTP & Login'}
+            </button>
+          </form>
+        )}
       </motion.div>
     </motion.div>
   )

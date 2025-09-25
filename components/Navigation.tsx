@@ -25,7 +25,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { UserRole } from '@/contexts/AuthContext'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import Spinner from './Spinner'
 
 const Navigation: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -34,9 +35,11 @@ const Navigation: React.FC = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
   
   const { user, logout } = useAuth()
   const { currentLanguage, setLanguage, t } = useLanguage()
+  const router = useRouter()
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -59,8 +62,12 @@ const Navigation: React.FC = () => {
 
   const pathname = usePathname();
 
+  // Remove router.events usage since AppRouterInstance does not support it
+  // If you want to show a loading spinner on navigation, consider using a global loading state or Next.js's built-in loading UI.
+
   return (
     <>
+      {loading && <Spinner />}
       <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
