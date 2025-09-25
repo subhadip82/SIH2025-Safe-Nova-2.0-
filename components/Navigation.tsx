@@ -40,14 +40,21 @@ const Navigation: React.FC = () => {
   const { user, logout } = useAuth()
   const { currentLanguage, setLanguage, t } = useLanguage()
   const router = useRouter()
+    const [alert, setAlert] = useState<string | null>(null);
+
+    // Mock function to trigger a demo emergency alert
+    const triggerMockAlert = () => {
+      setAlert('🚨 Emergency Alert: Flood warning in your area! Stay safe and follow official instructions.');
+      setTimeout(() => setAlert(null), 10000); // Auto-dismiss after 10 seconds
+    };
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'hi', name: 'हिन्दी', flag: '\ud83c\uddee🇳' },
-    { code: 'bn', name: 'বাংলা', flag: '\ud83c\udde7🇩' },
+    { code: 'hi', name: 'हिन्दी', flag: '��🇳' },
+    { code: 'bn', name: 'বাংলা', flag: '�🇳' },
     { code: 'ta', name: 'தமிழ்', flag: '🇮🇳' },
-    { code: 'te', name: 'తెలుగు', flag: '\ud83c\uddee🇳' },
-    { code: 'mr', name: 'मराठी', flag: '🇮\ud83c\uddf3' },
+    { code: 'te', name: 'తెలుగు', flag: '🇮🇳' },
+    { code: 'mr', name: 'मराठी', flag: '🇮🇳' },
     { code: 'gu', name: 'ગુજરાતી', flag: '🇮🇳' }
   ]
 
@@ -68,19 +75,33 @@ const Navigation: React.FC = () => {
   return (
     <>
       {loading && <Spinner />}
+      {/* Emergency Alert Banner (Mock) */}
+      {alert && (
+        <div className="bg-red-600 text-white text-center py-2 px-4 font-bold animate-pulse sticky top-0 z-[100]">
+          {alert}
+        </div>
+      )}
       <nav className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo and Name */}
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
-                <img src="/logo.png" alt="Safe Nova Logo" className="w-12 h-12 rounded-full border-2 border-blue-500 bg-white shadow" />
+                <img src="logo.png" alt="Safe Nova Logo" className="w-12 h-12 rounded-full border-2 border-blue-500 bg-white shadow" />
                 <span className="text-xl font-bold gradient-text">SafeNova</span>
               </div>
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
+              {/* Trigger Emergency Alert Button (Demo) */}
+              <button
+                onClick={triggerMockAlert}
+                className="bg-red-500 text-white p-2 rounded hover:bg-red-700 font-semibold flex items-center justify-center"
+                title="Trigger Emergency Alert (Demo)"
+              >
+                <AlertTriangle className="w-5 h-5" />
+              </button>
               {!user && pathname === '/' && (
                 <>
                   <Link href="/emergency-plan" className="flex items-center gap-2 text-gray-700 hover:text-green-600 transition-colors font-semibold">

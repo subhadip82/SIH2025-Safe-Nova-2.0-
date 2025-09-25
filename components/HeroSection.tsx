@@ -74,7 +74,7 @@ const prevSlide = () => {
   }
 
   return (
-    <section className="relative h-screen overflow-hidden">
+    <section className="relative min-h-[80vh] h-auto overflow-hidden flex flex-col justify-center">
       {/* Background Images */}
       <div className="absolute inset-0 pointer-events-none">
         <AnimatePresence mode="wait">
@@ -90,7 +90,7 @@ const prevSlide = () => {
             <img
               src={heroImages[currentSlide].src}
               alt={heroImages[currentSlide].title}
-              className="w-full h-full object-cover select-none"
+              className="w-full h-full object-cover object-center select-none min-h-[300px] max-h-[600px] sm:min-h-[400px] sm:max-h-[700px] md:min-h-[500px] md:max-h-[900px]"
               draggable={false}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"></div>
@@ -130,9 +130,9 @@ const prevSlide = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 h-full flex items-center">
+      <div className="relative z-10 h-full flex items-center justify-center py-8 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
             {/* Left Content */}
             <motion.div
               initial={{ opacity: 0, x: -50 }}
@@ -144,16 +144,15 @@ const prevSlide = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.8 }}
-                className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
+                className="text-2xl sm:text-4xl md:text-6xl font-bold mb-4 sm:mb-6 leading-tight"
               >
                 {t('hero.title')}
               </motion.h1>
-              
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
-                className="text-xl md:text-2xl mb-8 text-gray-200"
+                className="text-base sm:text-xl md:text-2xl mb-4 sm:mb-8 text-gray-200"
               >
                 {t('hero.subtitle')}
               </motion.p>
@@ -224,7 +223,7 @@ const prevSlide = () => {
               transition={{ delay: 0.8, duration: 0.8 }}
               className="hidden lg:block"
             >
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-4 sm:gap-6">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 text-white"

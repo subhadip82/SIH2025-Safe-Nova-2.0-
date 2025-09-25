@@ -35,9 +35,7 @@ const Footer: React.FC = () => {
             className="lg:col-span-1"
           >
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
+               <img src="logo.png" alt="Safe Nova Logo" className="w-12 h-12 rounded-full border-2 border-blue-500 bg-white shadow" />
               <span className="text-2xl font-bold">SafeNova</span>
             </div>
             <p className="text-gray-300 mb-6 max-w-sm">
