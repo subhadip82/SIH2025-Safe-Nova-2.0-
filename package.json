@@ -9,32 +9,38 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "14.0.4",
-    "react": "^18",
-    "react-dom": "^18",
-    "typescript": "^5",
+    "@googlemaps/react-wrapper": "^1.1.35",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "tailwindcss": "^3.3.0",
     "autoprefixer": "^10.0.1",
-    "postcss": "^8",
+    "axios": "^1.6.2",
     "framer-motion": "^10.16.16",
+    "glob": "^11.0.3",
+    "i18next": "^23.7.6",
     "lucide-react": "^0.294.0",
+    "next": "^14.2.33",
+    "next-themes": "^0.2.1",
+    "postcss": "^8",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.48.2",
     "react-hot-toast": "^2.4.1",
-    "next-themes": "^0.2.1",
     "react-i18next": "^13.5.0",
-    "i18next": "^23.7.6",
-    "react-query": "^3.39.3",
-    "axios": "^1.6.2",
-    "swiper": "^11.0.5",
     "react-intersection-observer": "^9.5.3",
-    "react-dropzone": "^14.2.3",
-    "@googlemaps/react-wrapper": "^1.1.35"
+    "react-query": "^3.39.3",
+    "rimraf": "^6.0.1",
+    "swiper": "^11.0.5",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5"
   },
   "devDependencies": {
     "eslint": "^8",
     "eslint-config-next": "14.0.4"
+  },
+  "resolutions": {
+    "glob": "^10.3.12",
+    "rimraf": "^5.0.10"
   }
 }
