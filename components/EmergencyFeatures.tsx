@@ -1,4 +1,3 @@
-  description: 'Add trusted contacts and share your safety status during emergencies.',
 'use client'
 
 import React, { useState, useRef } from 'react'
@@ -358,7 +357,7 @@ const EmergencyFeatures: React.FC = () => {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 className="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e: React.MouseEvent) => e.stopPropagation()}
               >
                 <div className="p-6">
                   <div className="flex justify-between items-center mb-6">
