@@ -38,15 +38,5 @@
   "devDependencies": {
     "eslint": "^8",
     "eslint-config-next": "14.0.4"
-  },
-  "resolutions": {
-    "glob": "^10.3.12",
-    "rimraf": "^5.0.10"
-  },
-  "overrides": {
-    "glob": "^11.0.3",
-    "rimraf": "^5.0.10",
-    "@eslint/config-array": "^0.15.1",
-    "@eslint/object-schema": "^2.1.4"
   }
 }
